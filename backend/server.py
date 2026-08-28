@@ -335,6 +335,11 @@ class Pipeline(threading.Thread):
         det = self.tracker.update_with_detections(det)
         det = self.smoother.update_with_detections(det)
         self.active = len(det)
+        # Frame khong co xe (hoac tracker lam rot metadata) -> dam bao luon co class_name
+        if "class_name" not in det.data or len(det.data["class_name"]) != len(det):
+            det.data["class_name"] = np.array(
+                [self.model.names.get(int(c), str(c)) for c in det.class_id] if det.class_id is not None else [], dtype=str
+            )
 
         # dem qua vach
         if self.line_zone is not None and det.tracker_id is not None:
