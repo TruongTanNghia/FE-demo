@@ -304,8 +304,12 @@ export default function TrafficMonitor({ engineSwitch = null }) {
   // ---------- Ve bang chuot ----------
   const toCanvas = (e) => {
     const c = canvasRef.current;
+    // object-fit: contain -> tru phan letterbox truoc khi quy ve toa do frame
     const r = c.getBoundingClientRect();
-    return { x: ((e.clientX - r.left) / r.width) * c.width, y: ((e.clientY - r.top) / r.height) * c.height };
+    const s = Math.min(r.width / c.width, r.height / c.height);
+    const ox = (r.width - c.width * s) / 2;
+    const oy = (r.height - c.height * s) / 2;
+    return { x: (e.clientX - r.left - ox) / s, y: (e.clientY - r.top - oy) / s };
   };
 
   const setTool = (m) => {
@@ -456,7 +460,7 @@ export default function TrafficMonitor({ engineSwitch = null }) {
       </header>
 
       <main className="stage" ref={stageRef}>
-        <div className="stage-inner" style={{ aspectRatio: `${videoSize.w} / ${videoSize.h}` }}>
+        <div className="stage-inner">
           <video ref={videoRef} muted playsInline onLoadedMetadata={onLoadedMeta} />
           <canvas
             ref={canvasRef}

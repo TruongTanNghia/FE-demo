@@ -43,7 +43,7 @@ export default function BackendMonitor({ engineSwitch }) {
   const [streamOk, setStreamOk] = useState(false);
 
   const canvasRef = useRef(null);
-  const imgRef = useRef(null);
+  const viewRef = useRef(null); // canvas hien luong MJPEG
   const draftRef = useRef([]);
   const cursorRef = useRef(null);
   const modeRef = useRef("none");
@@ -151,9 +151,9 @@ export default function BackendMonitor({ engineSwitch }) {
   // ---------- MJPEG qua fetch stream ----------
   const ready = online && status?.running && status.width > 0;
   useEffect(() => {
-    if (!ready || !imgRef.current) return;
+    if (!ready || !viewRef.current) return;
     setStreamOk(false);
-    const stop = startMjpeg(`${backendUrl}/stream.mjpg?k=${streamKey}`, imgRef.current, {
+    const stop = startMjpeg(`${backendUrl}/stream.mjpg?k=${streamKey}`, viewRef.current, {
       headers: headers(),
       onFrame: (n) => n === 1 && setStreamOk(true),
       onError: () => setStreamOk(false),
@@ -181,8 +181,12 @@ export default function BackendMonitor({ engineSwitch }) {
 
   const toCanvas = (e) => {
     const c = canvasRef.current;
+    // object-fit: contain -> tru phan letterbox truoc khi quy ve toa do frame
     const r = c.getBoundingClientRect();
-    return { x: ((e.clientX - r.left) / r.width) * c.width, y: ((e.clientY - r.top) / r.height) * c.height };
+    const s = Math.min(r.width / c.width, r.height / c.height);
+    const ox = (r.width - c.width * s) / 2;
+    const oy = (r.height - c.height * s) / 2;
+    return { x: (e.clientX - r.left - ox) / s, y: (e.clientY - r.top - oy) / s };
   };
 
   const pushConfig = (partial) => api("/api/config", partial).catch(() => {});
@@ -393,9 +397,8 @@ export default function BackendMonitor({ engineSwitch }) {
       )}
 
       <main className="stage">
-        <div className="stage-inner" style={{ aspectRatio: `${status?.width || 16} / ${status?.height || 9}` }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img ref={imgRef} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: ready ? "block" : "none" }} />
+        <div className="stage-inner">
+          <canvas ref={viewRef} className="view" style={{ display: ready ? "block" : "none" }} />
           <canvas
             ref={canvasRef}
             className={mode === "none" ? "idle" : ""}
