@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+.vercel
+.env*.local
+npm-debug.log*
+
+# runtime wasm duoc copy tu node_modules luc postinstall
+public/ort/
+
+# cau hinh relay co chua mat khau camera - KHONG commit
+rtsp-relay/go2rtc.yaml
+backend/violations/
+backend/uploads/
+backend/__pycache__/

@@ -1,0 +1,18 @@
+# Cau hinh go2rtc: chuyen camera RTSP -> MP4/HLS/WebRTC cho trinh duyet.
+# 1) Copy file nay thanh go2rtc.yaml (file do da duoc .gitignore - KHONG commit mat khau)
+# 2) Dien link RTSP that cua camera
+# 3) Chay go2rtc.exe cung thu muc -> mo http://localhost:1984 kiem tra
+# 4) Trong web-app dan: http://localhost:1984/api/stream.mp4?src=cam1
+#
+# Tai go2rtc: https://github.com/AlexxIT/go2rtc/releases
+
+streams:
+  cam1: rtsp://USER:PASSWORD@CAMERA_IP:554/h264/ch1/main/av_stream
+  # Neu mat khau co ky tu dac biet ($, @, #...) thi URL-encode: $ -> %24, @ -> %40, # -> %23
+  # Vi du mat khau "Abc$123" -> rtsp://user:Abc%24123@192.168.1.10:554/h264/ch1/main/av_stream
+
+api:
+  listen: ":1984"
+  origin: "*"      # cho phep web-app (domain khac) doc stream
+
+# Neu camera RTSP hay rot, them tuy chon: cam1: "ffmpeg:rtsp://...#video=copy"
