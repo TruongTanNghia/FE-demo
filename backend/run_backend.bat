@@ -4,8 +4,9 @@ REM Sua API_TOKEN thanh chuoi bi mat cua anh (dung cung token nay trong web-app)
 cd /d "%~dp0"
 
 set API_TOKEN=demo-token-doi-cai-nay
-set STREAM_WIDTH=1280
-set JPEG_QUALITY=75
+set STREAM_WIDTH=960
+set JPEG_QUALITY=60
+set STREAM_FPS=10
 set PORT=8000
 
 if exist "..\..\venv311\Scripts\python.exe" (

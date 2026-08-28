@@ -51,7 +51,8 @@ UPLOAD_DIR.mkdir(exist_ok=True)
 
 VEHICLE_CLASSES = [2, 3, 5, 7]
 STREAM_MAX_WIDTH = int(os.environ.get("STREAM_WIDTH", "1280"))  # thu nho frame MJPEG (chi de xem)
-JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "80"))  # giam (60-70) neu xem qua tunnel/mang yeu
+JPEG_QUALITY = int(os.environ.get("JPEG_QUALITY", "70"))  # giam (60-70) neu xem qua tunnel/mang yeu
+STREAM_FPS = float(os.environ.get("STREAM_FPS", "10"))  # gioi han fps cua luong hinh gui di (xu ly van full fps)
 IMGSZ = int(os.environ.get("IMGSZ", "640"))
 # Token bao ve khi mo backend ra internet (tunnel). De trong = khong kiem tra (chi dung trong LAN).
 API_TOKEN = os.environ.get("API_TOKEN", "").strip()
@@ -317,6 +318,10 @@ class Pipeline(threading.Thread):
                     time.sleep(spare)
 
     def _publish(self, frame):
+        now = time.time()
+        if now - getattr(self, "_last_pub", 0.0) < 1.0 / STREAM_FPS:
+            return  # tiet kiem bang thong: khong gui nhieu hon STREAM_FPS frame/giay
+        self._last_pub = now
         h, w = frame.shape[:2]
         if w > STREAM_MAX_WIDTH:
             s = STREAM_MAX_WIDTH / w

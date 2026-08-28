@@ -75,7 +75,8 @@ yolo export model=yolov8n.pt format=onnx imgsz=640 opset=12 simplify=True
 **Chạy backend trên máy anh:**
 1. Sửa `API_TOKEN` trong `backend/run_backend.bat` thành chuỗi bí mật, chạy file đó (GPU tự bật nếu có torch CUDA).
 2. Mở trang Vercel → **⚡ Backend GPU** → **🔗 Backend** → nhập `http://localhost:8000` + token → Lưu.
-3. Muốn xem từ máy khác: **ngrok** (`ngrok config add-authtoken ...` một lần, rồi `run_tunnel_ngrok.bat`) hoặc Cloudflare (`run_tunnel.bat`), dán URL `https://xxxx.ngrok-free.app` / `https://xxxx.trycloudflare.com` vào ô Backend. Chia sẻ cho người khác bằng link `https://<app>.vercel.app/?backend=https://xxxx.ngrok-free.app&token=...`.
+3. Muốn xem từ máy khác: **Cloudflare Tunnel** (`run_tunnel.bat`, không giới hạn băng thông) → dán URL `https://xxxx.trycloudflare.com` vào ô Backend. Chia sẻ cho người khác bằng link `https://<app>.vercel.app/?engine=backend&backend=https://xxxx.trycloudflare.com&token=...`.
+   ⚠ **ngrok free chỉ cho 1 GB/tháng** — luồng video cạn sau ~15 phút rồi trả `403 ERR_NGROK_725` (màn hình đen). Chỉ dùng ngrok khi có gói trả phí.
 
 Mọi dữ liệu (API, MJPEG, thống kê) đều đi qua `fetch()` có header `X-Token` + `ngrok-skip-browser-warning`, nên chạy được qua ngrok free (không dính trang "Visit Site"), Cloudflare, hay localhost. Backend bật token thì request không có token đúng bị 401 — an toàn khi mở ra internet. Biến môi trường backend: `API_TOKEN`, `PORT`, `STREAM_WIDTH` (1280), `JPEG_QUALITY` (75), `IMGSZ` (640).
 

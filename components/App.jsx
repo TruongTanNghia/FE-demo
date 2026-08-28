@@ -12,8 +12,11 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const e = localStorage.getItem(KEY);
+      // ?engine=backend tren URL (link chia se) > localStorage
+      const q = new URLSearchParams(window.location.search).get("engine");
+      const e = q === "backend" || q === "browser" ? q : localStorage.getItem(KEY);
       if (e === "backend" || e === "browser") setEngine(e);
+      if (q) localStorage.setItem(KEY, q);
     } catch {}
   }, []);
 

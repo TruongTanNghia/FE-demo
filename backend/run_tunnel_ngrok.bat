@@ -1,5 +1,7 @@
 @echo off
-REM Mo backend ra internet bang ngrok (thay the cho Cloudflare Tunnel).
+REM !!! CANH BAO: ngrok FREE chi cho 1 GB/thang -> luong video ~1 MB/s can sau ~15 phut (loi ERR_NGROK_725).
+REM !!! De demo video hay dung run_tunnel.bat (Cloudflare Tunnel, khong gioi han bang thong).
+REM Mo backend ra internet bang ngrok (chi hop khi co goi tra phi).
 REM 1) Tai ngrok: https://ngrok.com/download  -> ngrok.exe (dat canh file nay hoac trong PATH)
 REM 2) Dang nhap 1 lan:  ngrok config add-authtoken <token tren dashboard ngrok>
 REM 3) Chay run_backend.bat truoc, roi chay file nay.
