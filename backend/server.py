@@ -606,6 +606,30 @@ def stream():
                              headers={"Cache-Control": "no-cache"})
 
 
+@app.get("/stream.bin")
+def stream_bin():
+    """JPEG noi tiep nhau, content-type nhi phan thuan.
+    Dung cho fetch() trong trinh duyet: Chrome xu ly dac biet multipart/x-mixed-replace nen
+    fetch() khong nhan duoc luong tho; octet-stream thi qua ngrok/proxy/browser deu nguyen ven."""
+
+    def gen():
+        last = None
+        while True:
+            with pipeline.frame_cond:
+                pipeline.frame_cond.wait(timeout=1.0)
+                jpg = pipeline.latest_jpeg
+            if jpg is None or jpg is last:
+                continue
+            last = jpg
+            yield jpg
+
+    return StreamingResponse(
+        gen(),
+        media_type="application/octet-stream",
+        headers={"Cache-Control": "no-cache, no-store", "X-Content-Type-Options": "nosniff", "X-Accel-Buffering": "no"},
+    )
+
+
 @app.websocket("/ws")
 async def ws(websocket: WebSocket):
     if not _token_ok(websocket.query_params.get("token")):

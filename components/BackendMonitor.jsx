@@ -41,6 +41,7 @@ export default function BackendMonitor({ engineSwitch }) {
   const [sourceInput, setSourceInput] = useState("");
   const [streamKey, setStreamKey] = useState(0);
   const [streamOk, setStreamOk] = useState(false);
+  const [streamErr, setStreamErr] = useState("");
 
   const canvasRef = useRef(null);
   const viewRef = useRef(null); // canvas hien luong MJPEG
@@ -153,10 +154,17 @@ export default function BackendMonitor({ engineSwitch }) {
   useEffect(() => {
     if (!ready || !viewRef.current) return;
     setStreamOk(false);
-    const stop = startMjpeg(`${backendUrl}/stream.mjpg?k=${streamKey}`, viewRef.current, {
+    setStreamErr("");
+    const stop = startMjpeg(`${backendUrl}/stream.bin?k=${streamKey}`, viewRef.current, {
       headers: headers(),
-      onFrame: (n) => n === 1 && setStreamOk(true),
-      onError: () => setStreamOk(false),
+      onFrame: () => {
+        setStreamOk(true);
+        setStreamErr("");
+      },
+      onError: (e) => {
+        setStreamOk(false);
+        setStreamErr(e?.message || String(e));
+      },
     });
     return stop;
   }, [ready, backendUrl, streamKey, headers]);
@@ -425,7 +433,11 @@ export default function BackendMonitor({ engineSwitch }) {
               </div>
             </div>
           )}
-          {ready && !streamOk && <div className="hint" style={{ left: "auto", right: 12, bottom: 12 }}>Đang chờ luồng hình…</div>}
+          {ready && !streamOk && (
+            <div className="hint" style={{ left: "auto", right: 12, bottom: 12, color: streamErr ? "var(--red)" : "var(--amber)" }}>
+              {streamErr ? `Luồng hình lỗi: ${streamErr} — thử lại sau 2s` : "Đang chờ luồng hình…"}
+            </div>
+          )}
           {hint && <div className="hint">{hint}</div>}
           {ready && stats && (
             <div className="fps">
